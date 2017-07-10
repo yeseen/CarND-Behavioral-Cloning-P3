@@ -10,7 +10,7 @@ with open('dataX/driving_log.csv') as csvfile:
 		s_path = line[0]
 		fname = s_path.split('\\')[-1]
 		c_path = 'dataX/IMG/' + fname
-		print(c_path)
+		#print(c_path)
 		image = cv2.imread(c_path)
 		try :
 			image_flip = np.fliplr(image)
@@ -30,11 +30,13 @@ y_train = np.array(angles)
 print(X_train.shape)
 
 from keras.models import Sequential
-from keras.layers import Lambda, Flatten, Dense
+from keras.layers import Lambda, Flatten, Dense, Cropping2D
 from keras.layers.convolutional import Conv2D
-model = Sequential()
-model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160,320,3)))
 
+model = Sequential()
+
+model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160,320,3)))
+model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
 
 model.add(Conv2D(24, 5, 5, subsample=(2,2), border_mode='valid'))
 
@@ -54,8 +56,8 @@ model.add(Dense(10))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=2)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
 
-model.save('modelX1.h5')
+model.save('modelX2.h5')
 exit()
 
